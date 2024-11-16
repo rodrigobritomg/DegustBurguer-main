@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Deguster Hamburgueria",
   "main": "src/server.js",
-  "type": "module",
+
   "scripts": {
     "dev": "nodemon"
   },
