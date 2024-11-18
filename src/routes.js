@@ -1,5 +1,5 @@
-import { Router } from 'express'
-import { password } from './config/database'
+import { Router } from 'express';
+import { password } from './config/database';
 import UserContoller from './app/controllers/UserController';
 
 const routes = new Router()
