@@ -33,7 +33,7 @@ class UserController {
       },
     });
     if (userExists) {
-      return response.status(400).json({ error: "user alreandy exists" });
+      return response.status(400).json({ error: "Já Existe um usuário cadastrato com esse e-mail!" });
     }
 
     const user = await User.create({
@@ -54,64 +54,6 @@ class UserController {
 }
 
 export default new UserController();
-
-
-/*import { v4 } from 'uuid';
-import * as Yup from 'yup';
-import User from '../models/User';
-
-
-class UserController {
-    async store(request, response) {
-        // fazendo verificação com yup para que antes de ser chamado datasabe
-    // para fazer novo cadastro yup verifica shema caso encontra um erro deve intenrromper
-        const schema = Yup.object({
-            name: Yup.string().required(),
-            email: Yup.string().email().required(),
-            password: Yup.string().min(8).required(),
-            admin: Yup.boolean(),
-        });
-// na validação foi colocado abortEarly para não intenrromper e mostra todos os erros
-        try {
-            schema.validateSync(request.body, { abortEarly: false });
-        } catch (err) {
-            return response.status(400).json({ error: err.errors })
-        }
-
-        const { name, email, password, admin } = request.body
-
-        const userExists = await User.findOne({
-            where: {
-                email,
-            },
-        });
-
-        if (userExists) {
-            return response.status(400).json({ error: 'Já existe um usuário cadastrado com esse e-mail!' });
-        }
-
-        console.log(userExists);
-
-        const user = await User.create({
-            id: v4(),
-            name,
-            email,
-            password,
-            admin,
-        });
-
-        return response.status(201).json(user)({
-            id: user.id,
-            name,
-            email,
-            admin,
-        });
-
-    }
-}
-
-export default new UserController();
-
 
 /**
  * store => Cadastrar / Adicionar

@@ -1,8 +1,10 @@
 import Sequelize from 'sequelize';
-import configDatacase from '../config/database';
+import configDatabase from '../config/database';
 import User from '../app/models/User';
+import Products from '../app/models/Products';
+import Category from '../app/models/Category';
 
-const models = [User];
+const models = [User, Products, Category];
 
 class Database {
   constructor() {
@@ -10,8 +12,9 @@ class Database {
   }
 
   init() {
-    this.connection = new Sequelize(configDatacase);
-    models.map((model) => model.init(this.connection));
+    this.connection = new Sequelize(configDatabase);
+    models.
+    map((model) => model.init(this.connection));
   }
 }
 
