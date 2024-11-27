@@ -3,7 +3,7 @@ import Category from '../models/Category';
 
 class CategoryController {
   async store(request, response) {
-    // Definir o esquema de validação para os dados do corpo
+    // determinando como front deve enviar dados de logout para api
     const schema = Yup.object({
       name: Yup.string().required(),
     });
@@ -15,24 +15,29 @@ class CategoryController {
       return response.status(400).json({ error: err.errors });
     }
 
-    // Verificar se o arquivo foi enviado
-    if (!request.file) {
-      return response.status(400).json({ error: 'File is required.' });
-    }
-
     const { name, } = request.body; // Pegar os dados do corpo
 
+    const categoryExists = await Category.findOne({
+      where: {
+        name,
+      },
+    });
+
+    if (categoryExists) {
+      return response.status(400).json({ error: 'Category already exists' });
+    }
+
     // Criar o produto no banco de dados
-    const category = await Category.create({
+    const { id } = await Category.create({
       name,
     });
 
-    return response.status(201).json(category); // Retornar o produto criado
+    return response.status(201).json({ id, name }); // Retornar o produto criado
   }
 
   async index(request, response) {
     // Buscar todos os produtos no banco de dados
-    const categories = await Products.findAll();
+    const categories = await Category.findAll();
 
     return response.json(categories); // Retornar a lista de produtos
   }

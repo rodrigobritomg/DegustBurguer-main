@@ -39,6 +39,7 @@ class ProductController {
   async index(request, response) {
     // Buscar todos os produtos no banco de dados
     const products = await Products.findAll();
+    console.log({ userId: request.userId });
 
     return response.json(products); // Retornar a lista de produtos
   }

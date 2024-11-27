@@ -11,7 +11,7 @@ class App {
         this.routes();
     }
 
-    middlewares(){
+    middlewares() {
         this.app.use(express.json())
         this.app.use('/products-file', express.static(resolve(__dirname, '..', 'uploads')))
     }

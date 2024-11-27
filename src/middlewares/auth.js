@@ -1,3 +1,5 @@
+import jwt from "jsonwebtoken";
+import authConfig from "../config/auth";
 // fazendo pré definição de onde middllewares irá receber token
 function authMiddllewares(request, response, next) {
   const authToken = request.headers.authorization;
@@ -6,14 +8,25 @@ function authMiddllewares(request, response, next) {
   if (!authToken) {
     return response.status(401).json({ error: "Token invalid" });
   }
-/*function authMiddleware(request, response, next) {
-    const authToken = request.headers.authorization;
 
-    if (!authToken) {
-        return response.status(401).json({ error: 'Token not provided.' });
-    }*/
+  // fazendo separação dentro de um por espaco dentro de um array pra pegar apenas a posição auth
+  const validToken = authToken.split(" ").at(1);
 
-    return next();
+  // verifica a poição auth se é valido com .secret dentro do token antes de deixar aplicação seguir com token invalido
+  try {
+    jwt.verify(validToken, authConfig.secret, (err, decoded) => {
+      if (err) {
+        throw new Error();
+      }
+
+      request.userId = decoded.id;
+      request.userName = decoded.name
+    });
+  } catch (err) {
+    return response.status(401).json({ error: err });
+  }
+
+  return next();
 }
 
 export default authMiddllewares;
