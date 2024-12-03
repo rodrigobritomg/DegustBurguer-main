@@ -1,48 +1,121 @@
-import * as Yup from 'yup';
-import Products from '../models/Products';
+import * as Yup from "yup";
+import Product from "../models/Products";
+import Category from "../models/Category";
+import User from "../models/User";
 
 class ProductController {
   async store(request, response) {
-    // Definir o esquema de validação para os dados do corpo
+    // determinando como front deve enviar dados de logout para api
     const schema = Yup.object({
       name: Yup.string().required(),
       price: Yup.number().required(),
-      category: Yup.string().required(),
+      category_id: Yup.number().required(),
+      offer: Yup.boolean(),
     });
-
+    // na validação foi colocado abortEarly para não intenrromper e mostra todos os erros
     try {
-      // Validar os dados do corpo da requisição
       schema.validateSync(request.body, { abortEarly: false });
     } catch (err) {
       return response.status(400).json({ error: err.errors });
     }
 
-    // Verificar se o arquivo foi enviado
-    if (!request.file) {
-      return response.status(400).json({ error: 'File is required.' });
+    // fazendo validação se usuario é admin para poder alterar categorias
+    // indo ate model que está salvo user,busca pelo id indo do request se tem esse user la
+    // se propierade admin for correta segue fluxo
+    const { admin: isAdmin } = await User.findByPk(request.userId);
+    if (!isAdmin) {
+      return response.status(401).json();
     }
 
-    const { filename: path } = request.file; // Pegar o nome do arquivo
-    const { name, price, category } = request.body; // Pegar os dados do corpo
+    const { filename: path } = request.file;
+    const { name, price, category_id, offer } = request.body;
 
-    // Criar o produto no banco de dados
-    const product = await Products.create({
+    const product = await Product.create({
       name,
       price,
-      category,
+      category_id,
       path,
+      offer,
     });
 
-    return response.status(201).json(product); // Retornar o produto criado
+    return response.status(201).json(product);
   }
 
   async index(request, response) {
-    // Buscar todos os produtos no banco de dados
-    const products = await Products.findAll();
-    console.log({ userId: request.userId });
+    const products = await Product.findAll({
+      // criando esse campo para que no findeall vá ate a model product onde está sendo relacionado tabelas
+      // indo la trás somentes atributos aolicitados id/name
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "name"],
+        },
+      ],
+    });
 
-    return response.json(products); // Retornar a lista de produtos
+    return response.json(products);
+  }
+
+  async update(request, response) {
+    // determinando como front deve enviar dados de logout para api
+    const schema = Yup.object({
+      name: Yup.string(),
+      price: Yup.number(),
+      category_id: Yup.number(),
+      offer: Yup.boolean(),
+    });
+    // na validação foi colocado abortEarly para não intenrromper e mostra todos os erros
+    try {
+      schema.validateSync(request.body, { abortEarly: false });
+    } catch (err) {
+      return response.status(400).json({ error: err.errors });
+    }
+
+    // fazendo validação se usuario é admin para poder alterar categorias
+    // indo ate model que está salvo user,busca pelo id indo do request se tem esse user la
+    // se propierade admin for correta segue fluxo
+    const { admin: isAdmin } = await User.findByPk(request.userId);
+    if (!isAdmin) {
+      return response.status(401).json();
+    }
+
+    // fazendo validação se id mandado consta no database antes de seguir
+    const { id } = request.params;
+    const findProduct = await Product.findByPk(id);
+    if (!findProduct) {
+      return response.status(401).json({ error: "Makesure id is correct?" });
+    }
+
+    // fazendo verificação se user está atualizando path tbm
+    // caso path não existir na atualização não muda valor da variavel
+    let path;
+    if (request.file) {
+      path = request.file.filename;
+    }
+
+    // após todas informaços baterem chama database para salvar
+    // como segundo parametro informando onde vai ser feito update
+    const { name, price, category_id, offer } = request.body;
+
+    await Product.update(
+      {
+        name,
+        price,
+        category_id,
+        path,
+        offer,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+
+    return response.status(201).json();
   }
 }
 
 export default new ProductController();
+

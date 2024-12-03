@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import authConfig from "../config/auth";
+import authConfig from "../../config/auth";
 // fazendo pré definição de onde middllewares irá receber token
 function authMiddllewares(request, response, next) {
   const authToken = request.headers.authorization;
 
-  // fazendo verificação caso token não foi enviado
+  // fazendo verificação caso token não foi enviado 
   if (!authToken) {
     return response.status(401).json({ error: "Token invalid" });
   }
