@@ -1,3 +1,5 @@
+"use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -21,10 +23,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+
       admin: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
+        allowNull: false,
       },
+
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

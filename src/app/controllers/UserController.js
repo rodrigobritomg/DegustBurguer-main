@@ -33,7 +33,7 @@ class UserController {
       },
     });
     if (userExists) {
-      return response.status(400).json({ error: "Já Existe um usuário cadastrato com esse e-mail!" });
+      return response.status(400).json({ error: "user alreandy exists" });
     }
 
     const user = await User.create({
@@ -54,12 +54,3 @@ class UserController {
 }
 
 export default new UserController();
-
-/**
- * store => Cadastrar / Adicionar
- * index => Listar vários
- * Show => listar apenas um
- * update => Atualizar
- * delete => Deletar
- */
-
